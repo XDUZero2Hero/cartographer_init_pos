@@ -6,10 +6,10 @@
     <node pkg="icra_init_carto" type="icra_init_carto_node" name="icra_init_carto_node">
         <param name="init_quat_x" value="0"/>
         <param name="init_quat_y" value="0"/>
-        <param name="init_quat_z" value="-0.6995251345854655"/>
-        <param name="init_quat_w" value="0.7146079946958237"/>
-        <param name="init_pos_x" value="3.5"/>
-        <param name="init_pos_y" value="0"/>
+        <param name="init_quat_z" value="0.707"/>
+        <param name="init_quat_w" value="0.707"/>
+        <param name="init_pos_x" value="0"/>
+        <param name="init_pos_y" value="-7"/>
         <param name="init_pos_z" value="0"/>
         <param name="configuration_basename" value="icra_2d_localization_$(arg color)_$(arg id).lua"/>
         <param name="configuration_directory" value="$(find icra_cartographer)/configuration_files"/>
