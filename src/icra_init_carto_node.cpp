@@ -9,8 +9,12 @@
  *
  */
 #include <ros/ros.h>
+
 #include "cartographer_ros_msgs/StartTrajectory.h"
 #include "cartographer_ros_msgs/FinishTrajectory.h"
+
+#include <std_srvs/Trigger.h>
+
 
 int main(int argc, char **argv)
 {
@@ -49,8 +53,9 @@ int main(int argc, char **argv)
     private_nh.getParam("init_quat_w",init_quat_w);
 
 
-    ros::ServiceClient finish_trajectory_client = nh.serviceClient<cartographer_ros_msgs::FinishTrajectoryRequest>("/red_1/finish_trajectory");
-    ros::ServiceClient start_trajectory_client = nh.serviceClient<cartographer_ros_msgs::StartTrajectoryRequest>("start_trajectory");
+    ros::ServiceClient finish_trajectory_client = nh.serviceClient<cartographer_ros_msgs::FinishTrajectory>("finish_trajectory");
+    ros::ServiceClient start_trajectory_client = nh.serviceClient<cartographer_ros_msgs::StartTrajectory>("start_trajectory");
+
 
     cartographer_ros_msgs::FinishTrajectory finish_trajectory_request;
     cartographer_ros_msgs::StartTrajectory start_trajectory_request;
@@ -72,29 +77,29 @@ int main(int argc, char **argv)
     start_trajectory_request.request.configuration_directory = configuration_directory;
 
     ros::Rate fail_rate = ros::Rate(1);
-    while (!finish_trajectory_client.exists())
+    while (!finish_trajectory_client.exists()&&ros::ok())
     {
         ROS_ERROR("Finish trajectory service do not exists, will try after 1 s");
         fail_rate.sleep();
     }
-    while (!finish_trajectory_client.call(finish_trajectory_request))
+    while (!finish_trajectory_client.call(finish_trajectory_request)&&ros::ok())
     {
-        ROS_ERROR("Finish trajectory failed, will try after 1 s");
+        ROS_ERROR("Finish trajectory failed, response %s", finish_trajectory_request.response.status.message.c_str());
         fail_rate.sleep();
     }
-    ROS_INFO("succeccfully finished last trajectory");
+    ROS_INFO("succeccfully finished last trajectory,response %s", finish_trajectory_request.response.status.message.c_str());
 
-    while (!start_trajectory_client.exists())
+    while (!start_trajectory_client.exists()&&ros::ok())
     {
         ROS_ERROR("Start trajectory service do not exists, will try after 1 s");
         fail_rate.sleep();
     }
-    while (!start_trajectory_client.call(start_trajectory_request))
+    while (!start_trajectory_client.call(start_trajectory_request)&&ros::ok())
     {
-        ROS_ERROR("Start trajectory failed, will try after 1 s");
+        ROS_ERROR("Start trajectory failed, response %s",start_trajectory_request.response.status.message.c_str());
         fail_rate.sleep();
     }
-    ROS_INFO("succeccfully Start last trajectory");
+    ROS_INFO("succeccfully Start last trajectory response: %s",start_trajectory_request.response.status.message.c_str());
 
     return 0;
 }
